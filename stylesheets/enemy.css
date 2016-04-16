@@ -2,27 +2,26 @@
 .enemy {
   width: 100%;
   height: 30px;
-  background-color: grey;
   position: absolute;
   z-index: 1;
 }
-/* line 8, ../sass/enemy.sass */
+/* line 7, ../sass/enemy.sass */
 .enemy .enemyHole {
   width: 30px;
   height: 30px;
   position: absolute;
-  background-color: red;
+  background-color: white;
 }
-/* line 14, ../sass/enemy.sass */
+/* line 13, ../sass/enemy.sass */
 .enemy .enemyHole.circle {
   border-radius: 50%;
 }
-/* line 17, ../sass/enemy.sass */
+/* line 16, ../sass/enemy.sass */
 .enemy .enemyHole.triangle {
   width: 0px;
   height: 0px;
   background-color: transparent;
-  border-bottom: 30px solid red;
+  border-bottom: 30px solid white;
   border-left: 15px solid transparent;
   border-right: 15px solid transparent;
 }

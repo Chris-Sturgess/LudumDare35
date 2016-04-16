@@ -18,6 +18,8 @@ Game = (function() {
   Game.prototype.timeInterval = 1000;
 
   function Game() {
+    this.destroyEnemy = bind(this.destroyEnemy, this);
+    this.endGame = bind(this.endGame, this);
     this.generateEnemy = bind(this.generateEnemy, this);
     this.initGame();
   }
@@ -29,7 +31,9 @@ Game = (function() {
   Game.prototype.initGame = function() {
     this.$gameBox = $('#gameBox');
     this.$car = new Character(this.$gameBox, this);
-    this.timeInterval = 5000;
+    this.timeInterval = 500;
+    this.enemyCounter = 1;
+    this.enemies = {};
     return this.initTimer();
   };
 
@@ -38,9 +42,20 @@ Game = (function() {
   };
 
   Game.prototype.generateEnemy = function() {
-    new Enemy(this.$gameBox, this.timeInterval * 2, this.$car, this.CIRCLE, this.TRIANGLE, this.SQUARE);
+    this.enemies[this.enemyCounter] = new Enemy(this.$gameBox, this.timeInterval * 2, this.$car, this, this.enemyCounter, this.CIRCLE, this.TRIANGLE, this.SQUARE);
     this.timer = setTimeout(this.generateEnemy, this.timeInterval);
-    return this.timeInterval = this.timeInterval * 0.99;
+    this.timeInterval = this.timeInterval * 0.99;
+    if (this.timeInterval < 800) {
+      this.timeInterval = 800;
+    }
+    return this.enemyCounter += 1;
+  };
+
+  Game.prototype.endGame = function() {};
+
+  Game.prototype.destroyEnemy = function(id) {
+    this.enemies[id].$me.remove();
+    return this.enemies[id] = null;
   };
 
   return Game;
@@ -179,13 +194,16 @@ Enemy = (function() {
 
   Enemy.prototype.POS = [150, 300, 450];
 
-  function Enemy($gameBox, speed, $player, val1, val2, val3) {
+  function Enemy($gameBox, speed, $player, game, id1, val1, val2, val3) {
     this.$gameBox = $gameBox;
     this.speed = speed;
     this.$player = $player;
+    this.game = game;
+    this.id = id1;
     this.val1 = val1;
     this.val2 = val2;
     this.val3 = val3;
+    this.destroyMe = bind(this.destroyMe, this);
     this.checkDestroy = bind(this.checkDestroy, this);
     this.startAnimation = bind(this.startAnimation, this);
     this.createEnemyDiv();
@@ -224,13 +242,20 @@ Enemy = (function() {
     pos = this.$player.myPos;
     if (this.myHoles[pos] === this.$player.type) {
       return this.destroyMe();
+    } else {
+      return this.game.endGame();
     }
   };
 
   Enemy.prototype.destroyMe = function() {
-    return this.$me.toggle("explode", {
+    this.$me.toggle("explode", {
       pieces: 27
     }, "slow");
+    return setTimeout(((function(_this) {
+      return function() {
+        return _this.game.destroyEnemy(_this.id);
+      };
+    })(this)), 500);
   };
 
   return Enemy;

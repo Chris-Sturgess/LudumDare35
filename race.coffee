@@ -18,16 +18,26 @@ class Game
 	initGame: ->
 		@$gameBox = $('#gameBox')
 		@$car = new Character(@$gameBox, this)
-		@timeInterval = 5000
+		@timeInterval = 500
+		@enemyCounter = 1
+		@enemies = {}
 		@initTimer()
 
 	initTimer: ->
 		@timer = setTimeout(@generateEnemy, 1000)
 
 	generateEnemy: =>
-		new Enemy(@$gameBox, @timeInterval * 2, @$car, @CIRCLE, @TRIANGLE, @SQUARE)
+		@enemies[@enemyCounter] = new Enemy(@$gameBox, @timeInterval * 2, @$car, this, @enemyCounter, @CIRCLE, @TRIANGLE, @SQUARE)
 		@timer = setTimeout(@generateEnemy, @timeInterval)
 		@timeInterval = @timeInterval * 0.99
+		@timeInterval = 800 if @timeInterval < 800
+		@enemyCounter += 1
+
+	endGame: =>
+
+	destroyEnemy: (id) =>
+		@enemies[id].$me.remove()
+		@enemies[id] = null
 
 class Character
 
@@ -115,7 +125,7 @@ class Enemy
 
 	POS: [150, 300, 450]
 
-	constructor: (@$gameBox, @speed, @$player, @val1, @val2, @val3) ->
+	constructor: (@$gameBox, @speed, @$player, @game, @id, @val1, @val2, @val3) ->
 		@createEnemyDiv()
 
 	createEnemyDiv: () ->
@@ -145,9 +155,14 @@ class Enemy
 		pos = @$player.myPos
 		if @myHoles[pos] is @$player.type
 			@destroyMe();
+		else
+			@game.endGame();
 
-	destroyMe: ->
+	destroyMe: =>
 		@$me.toggle("explode", {pieces: 27}, "slow")
+		setTimeout (=>
+			@game.destroyEnemy(@id)
+		), 500
 
 $(document).ready(->
 	window.game = new Game()
