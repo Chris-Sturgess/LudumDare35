@@ -1,0 +1,49 @@
+/* line 1, ../sass/header.sass */
+#headerBar {
+  height: 100px;
+  width: 100%;
+  background-color: red;
+}
+
+/* line 1, ../sass/character.sass */
+.character {
+  width: 30px;
+  height: 30px;
+  background-color: blue;
+  position: absolute;
+}
+/* line 7, ../sass/character.sass */
+.character.circle {
+  border-radius: 50%;
+}
+/* line 10, ../sass/character.sass */
+.character.triangle {
+  width: 0px;
+  height: 0px;
+  background-color: none;
+  border-bottom: 30px solid transparent;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+}
+
+/* line 5, ../sass/main.sass */
+body {
+  background-color: #000000;
+  padding: 0;
+  margin: 0;
+}
+/* line 10, ../sass/main.sass */
+body #gamePage {
+  margin: auto;
+  width: 600px;
+  border-left: 1px solid #FFFFFF;
+  border-right: 1px solid #FFFFFF;
+  height: 100%;
+  position: relative;
+}
+/* line 18, ../sass/main.sass */
+body #gamePage #gameBox {
+  height: 500px;
+  width: 100%;
+  background-color: orange;
+}
