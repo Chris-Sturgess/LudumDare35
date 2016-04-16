@@ -9,7 +9,7 @@ Game = (function() {
 
   function Game() {
     this.$gameBox = $('#gameBox');
-    this.car = new Character();
+    this.car = new Character(this.$gameBox, this);
   }
 
   Game.prototype.$ = function(s) {
@@ -27,6 +27,8 @@ Character = (function() {
 
   Character.prototype.SQUARE = 'square';
 
+  Character.prototype.TYPES = [Character.CIRCLE, Character.TRIANGLE, Character.SQUARE];
+
   Character.prototype.POS = [150, 300, 450];
 
   Character.prototype.myWidth = 30;
@@ -41,18 +43,32 @@ Character = (function() {
 
   Character.type;
 
-  function Character() {
+  Character.myType;
+
+  function Character($gameBox, parent) {
+    this.$gameBox = $gameBox;
+    this.parent = parent;
+    this.checkKey = bind(this.checkKey, this);
     this.setLoc = bind(this.setLoc, this);
     this.$me = $('.character');
+    this.TYPES = [this.CIRCLE, this.TRIANGLE, this.SQUARE];
     this.initChar();
+    this.initKeys();
   }
 
   Character.prototype.initChar = function() {
-    this.setType(this.SQUARE);
+    this.setType(2);
     return this.setLoc(0);
   };
 
+  Character.prototype.initKeys = function() {
+    return $(document).keyup(this.checkKey);
+  };
+
   Character.prototype.setLoc = function(l) {
+    if (!((0 <= l && l <= 2))) {
+      return;
+    }
     this.myPos = l;
     return this.$me.offset({
       left: this.POS[l],
@@ -60,12 +76,45 @@ Character = (function() {
     });
   };
 
-  Character.prototype.setType = function(type) {
+  Character.prototype.setType = function(t) {
+    var s;
+    console.log(t);
+    s = t;
+    if (s > 2) {
+      s = 0;
+    }
+    if (s < 0) {
+      s = 2;
+    }
+    console.log(s);
+    this.myType = s;
+    this.type = this.TYPES[s];
+    console.log(this.type);
     this.$me.removeClass(this.CIRCLE);
     this.$me.removeClass(this.SQUARE);
     this.$me.removeClass(this.TRIANGLE);
-    this.type = type;
     return this.$me.addClass(this.type);
+  };
+
+  Character.prototype.checkKey = function(e) {
+    var key;
+    key = e.which;
+    switch (key) {
+      case 37:
+        this.setLoc(this.myPos - 1);
+        break;
+      case 38:
+        this.setType(this.myType + 1);
+        break;
+      case 39:
+        this.setLoc(this.myPos + 1);
+        break;
+      case 40:
+        this.setType(this.myType - 1);
+    }
+    if ((37 <= e && e <= 40)) {
+      return e.preventDefault();
+    }
   };
 
   return Character;
