@@ -3,17 +3,37 @@ var Character, Game,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 Game = (function() {
-  Game.car;
+  Game.car = null;
 
-  Game.$gameBox;
+  Game.$gameBox = null;
+
+  Game.timer = null;
+
+  Game.timeInterval = 1000;
 
   function Game() {
-    this.$gameBox = $('#gameBox');
-    this.car = new Character(this.$gameBox, this);
+    this.generateEnemy = bind(this.generateEnemy, this);
+    this.initGame();
   }
 
   Game.prototype.$ = function(s) {
     return this.$gameBox.find(s);
+  };
+
+  Game.prototype.initGame = function() {
+    this.$gameBox = $('#gameBox');
+    this.car = new Character(this.$gameBox, this);
+    this.timeInterval = 1000;
+    return this.initTimer();
+  };
+
+  Game.prototype.initTimer = function() {
+    return this.timer = setTimeout(this.generateEnemy, 2000);
+  };
+
+  Game.prototype.generateEnemy = function() {
+    this.timer = setTimeout(this.generateEnemy, this.timeInterval);
+    return this.timeInterval = this.timeInterval * 0.99;
   };
 
   return Game;
@@ -31,23 +51,31 @@ Character = (function() {
 
   Character.prototype.POS = [150, 300, 450];
 
+  Character.prototype.PRESSED = {
+    37: false,
+    38: false,
+    39: false,
+    40: false
+  };
+
   Character.prototype.myWidth = 30;
 
   Character.prototype.myHeight = 30;
 
   Character.prototype.myTop = 400;
 
-  Character.myPos;
+  Character.prototype.myPos = 0;
 
-  Character.$me;
+  Character.prototype.$me = null;
 
-  Character.type;
+  Character.prototype.type = null;
 
-  Character.myType;
+  Character.prototype.myType = null;
 
   function Character($gameBox, parent) {
     this.$gameBox = $gameBox;
     this.parent = parent;
+    this.clearUp = bind(this.clearUp, this);
     this.checkKey = bind(this.checkKey, this);
     this.setLoc = bind(this.setLoc, this);
     this.$me = $('.character');
@@ -62,7 +90,8 @@ Character = (function() {
   };
 
   Character.prototype.initKeys = function() {
-    return $(document).keyup(this.checkKey);
+    $(document).keydown(this.checkKey);
+    return $(document).keyup(this.clearUp);
   };
 
   Character.prototype.setLoc = function(l) {
@@ -70,10 +99,8 @@ Character = (function() {
       return;
     }
     this.myPos = l;
-    return this.$me.offset({
-      left: this.POS[l],
-      top: this.myTop
-    });
+    this.$me.css('left', this.POS[l]);
+    return this.$me.css('top', this.myTop);
   };
 
   Character.prototype.setType = function(t) {
@@ -86,10 +113,8 @@ Character = (function() {
     if (s < 0) {
       s = 2;
     }
-    console.log(s);
     this.myType = s;
     this.type = this.TYPES[s];
-    console.log(this.type);
     this.$me.removeClass(this.CIRCLE);
     this.$me.removeClass(this.SQUARE);
     this.$me.removeClass(this.TRIANGLE);
@@ -101,19 +126,34 @@ Character = (function() {
     key = e.which;
     switch (key) {
       case 37:
-        this.setLoc(this.myPos - 1);
+        if (!this.PRESSED[37]) {
+          this.setLoc(this.myPos - 1);
+        }
         break;
       case 38:
-        this.setType(this.myType + 1);
+        if (!this.PRESSED[38]) {
+          this.setType(this.myType + 1);
+        }
         break;
       case 39:
-        this.setLoc(this.myPos + 1);
+        if (!this.PRESSED[39]) {
+          this.setLoc(this.myPos + 1);
+        }
         break;
       case 40:
-        this.setType(this.myType - 1);
+        if (!this.PRESSED[40]) {
+          this.setType(this.myType - 1);
+        }
     }
-    if ((37 <= e && e <= 40)) {
-      return e.preventDefault();
+    if ((37 <= key && key <= 40)) {
+      e.preventDefault();
+      return this.PRESSED[key] = true;
+    }
+  };
+
+  Character.prototype.clearUp = function(e) {
+    if (this.PRESSED[e.which]) {
+      return this.PRESSED[e.which] = false;
     }
   };
 
