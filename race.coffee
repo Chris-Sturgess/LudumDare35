@@ -112,17 +112,19 @@ class Enemy
 	TRIANGLE: 'triangle'
 	SQUARE: 'square'
 
+	endTop: 400
+
 	POS: [150, 300, 450]
 
 	constructor: (@$gameBox, @speed, @val1, @val2, @val3) ->
 		@createEnemyDiv()
 
 	createEnemyDiv: () ->
-		console.log(@$gameBox)
 		@$me = $('<div class="enemy">')
 		@$me.css('top', 0)
 		@createEnemyHoles()
 		@$gameBox.append(@$me)
+		@startAnimation()
 
 	createEnemyHoles: () ->
 		@$me.append(@createEnemyHole(0, @val1))
@@ -133,6 +135,12 @@ class Enemy
 		hole = $("<div class='enemyHole #{type}'>")
 		hole.css('left', @POS[pos])
 		hole
+
+	startAnimation: () ->
+		@$me.animate {
+			top: @endTop
+			}, 5000, "linear"
+
 
 $(document).ready(->
 	window.game = new Game()

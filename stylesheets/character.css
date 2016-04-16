@@ -4,12 +4,13 @@
   height: 30px;
   background-color: blue;
   position: absolute;
+  z-index: 10;
 }
-/* line 7, ../sass/character.sass */
+/* line 8, ../sass/character.sass */
 .character.circle {
   border-radius: 50%;
 }
-/* line 10, ../sass/character.sass */
+/* line 11, ../sass/character.sass */
 .character.triangle {
   width: 0px;
   height: 0px;

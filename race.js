@@ -176,6 +176,8 @@ Enemy = (function() {
 
   Enemy.prototype.SQUARE = 'square';
 
+  Enemy.prototype.endTop = 400;
+
   Enemy.prototype.POS = [150, 300, 450];
 
   function Enemy($gameBox, speed, val1, val2, val3) {
@@ -188,11 +190,11 @@ Enemy = (function() {
   }
 
   Enemy.prototype.createEnemyDiv = function() {
-    console.log(this.$gameBox);
     this.$me = $('<div class="enemy">');
     this.$me.css('top', 0);
     this.createEnemyHoles();
-    return this.$gameBox.append(this.$me);
+    this.$gameBox.append(this.$me);
+    return this.startAnimation();
   };
 
   Enemy.prototype.createEnemyHoles = function() {
@@ -206,6 +208,12 @@ Enemy = (function() {
     hole = $("<div class='enemyHole " + type + "'>");
     hole.css('left', this.POS[pos]);
     return hole;
+  };
+
+  Enemy.prototype.startAnimation = function() {
+    return this.$me.animate({
+      top: this.endTop
+    }, 5000, "linear");
   };
 
   return Enemy;
