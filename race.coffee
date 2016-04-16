@@ -1,9 +1,13 @@
 class Game
 
-	@car: null
-	@$gameBox: null
-	@timer: null
-	@timeInterval: 1000
+	CIRCLE: 'circle'
+	TRIANGLE: 'triangle'
+	SQUARE: 'square'
+
+	car: null
+	$gameBox: null
+	timer: null
+	timeInterval: 5000
 
 	constructor: ->
 		@initGame()
@@ -14,13 +18,15 @@ class Game
 	initGame: ->
 		@$gameBox = $('#gameBox')
 		@car = new Character(@$gameBox, this)
-		@timeInterval = 1000
+		@timeInterval = 5000
+		@enemies = []
 		@initTimer()
 
 	initTimer: ->
-		@timer = setTimeout(@generateEnemy, 2000)
+		@timer = setTimeout(@generateEnemy, 1000)
 
 	generateEnemy: =>
+		@enemies.push(new Enemy(@$gameBox, 1, @CIRCLE, @TRIANGLE, @SQUARE))
 		@timer = setTimeout(@generateEnemy, @timeInterval)
 		@timeInterval = @timeInterval * 0.99
 
@@ -100,6 +106,33 @@ class Character
 	clearUp: (e) =>
 		@PRESSED[e.which] = false if @PRESSED[e.which]
 
+class Enemy
+
+	CIRCLE: 'circle'
+	TRIANGLE: 'triangle'
+	SQUARE: 'square'
+
+	POS: [150, 300, 450]
+
+	constructor: (@$gameBox, @speed, @val1, @val2, @val3) ->
+		@createEnemyDiv()
+
+	createEnemyDiv: () ->
+		console.log(@$gameBox)
+		@$me = $('<div class="enemy">')
+		@$me.css('top', 0)
+		@createEnemyHoles()
+		@$gameBox.append(@$me)
+
+	createEnemyHoles: () ->
+		@$me.append(@createEnemyHole(0, @val1))
+		@$me.append(@createEnemyHole(1, @val2))
+		@$me.append(@createEnemyHole(2, @val3))
+
+	createEnemyHole: (pos, type) ->
+		hole = $("<div class='enemyHole #{type}'>")
+		hole.css('left', @POS[pos])
+		hole
 
 $(document).ready(->
 	window.game = new Game()
