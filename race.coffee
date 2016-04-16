@@ -1,1 +1,1 @@
-x = 2
+console.log("Imported")
