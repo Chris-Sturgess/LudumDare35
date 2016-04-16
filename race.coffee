@@ -4,10 +4,10 @@ class Game
 	TRIANGLE: 'triangle'
 	SQUARE: 'square'
 
-	car: null
+	$car: null
 	$gameBox: null
 	timer: null
-	timeInterval: 5000
+	timeInterval: 1000
 
 	constructor: ->
 		@initGame()
@@ -17,16 +17,15 @@ class Game
 
 	initGame: ->
 		@$gameBox = $('#gameBox')
-		@car = new Character(@$gameBox, this)
+		@$car = new Character(@$gameBox, this)
 		@timeInterval = 5000
-		@enemies = []
 		@initTimer()
 
 	initTimer: ->
 		@timer = setTimeout(@generateEnemy, 1000)
 
 	generateEnemy: =>
-		@enemies.push(new Enemy(@$gameBox, 1, @CIRCLE, @TRIANGLE, @SQUARE))
+		new Enemy(@$gameBox, @timeInterval * 2, @$car, @CIRCLE, @TRIANGLE, @SQUARE)
 		@timer = setTimeout(@generateEnemy, @timeInterval)
 		@timeInterval = @timeInterval * 0.99
 
@@ -116,7 +115,7 @@ class Enemy
 
 	POS: [150, 300, 450]
 
-	constructor: (@$gameBox, @speed, @val1, @val2, @val3) ->
+	constructor: (@$gameBox, @speed, @$player, @val1, @val2, @val3) ->
 		@createEnemyDiv()
 
 	createEnemyDiv: () ->
@@ -127,6 +126,7 @@ class Enemy
 		@startAnimation()
 
 	createEnemyHoles: () ->
+		@myHoles = [@val1, @val2, @val3]
 		@$me.append(@createEnemyHole(0, @val1))
 		@$me.append(@createEnemyHole(1, @val2))
 		@$me.append(@createEnemyHole(2, @val3))
@@ -136,11 +136,18 @@ class Enemy
 		hole.css('left', @POS[pos])
 		hole
 
-	startAnimation: () ->
+	startAnimation: () =>
 		@$me.animate {
 			top: @endTop
-			}, 5000, "linear"
+			}, @speed, "linear", @checkDestroy
 
+	checkDestroy: =>
+		pos = @$player.myPos
+		if @myHoles[pos] is @$player.type
+			@destroyMe();
+
+	destroyMe: ->
+		@$me.toggle("explode", {pieces: 27}, "slow")
 
 $(document).ready(->
 	window.game = new Game()

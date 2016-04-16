@@ -9,13 +9,13 @@ Game = (function() {
 
   Game.prototype.SQUARE = 'square';
 
-  Game.prototype.car = null;
+  Game.prototype.$car = null;
 
   Game.prototype.$gameBox = null;
 
   Game.prototype.timer = null;
 
-  Game.prototype.timeInterval = 5000;
+  Game.prototype.timeInterval = 1000;
 
   function Game() {
     this.generateEnemy = bind(this.generateEnemy, this);
@@ -28,9 +28,8 @@ Game = (function() {
 
   Game.prototype.initGame = function() {
     this.$gameBox = $('#gameBox');
-    this.car = new Character(this.$gameBox, this);
+    this.$car = new Character(this.$gameBox, this);
     this.timeInterval = 5000;
-    this.enemies = [];
     return this.initTimer();
   };
 
@@ -39,7 +38,7 @@ Game = (function() {
   };
 
   Game.prototype.generateEnemy = function() {
-    this.enemies.push(new Enemy(this.$gameBox, 1, this.CIRCLE, this.TRIANGLE, this.SQUARE));
+    new Enemy(this.$gameBox, this.timeInterval * 2, this.$car, this.CIRCLE, this.TRIANGLE, this.SQUARE);
     this.timer = setTimeout(this.generateEnemy, this.timeInterval);
     return this.timeInterval = this.timeInterval * 0.99;
   };
@@ -180,12 +179,15 @@ Enemy = (function() {
 
   Enemy.prototype.POS = [150, 300, 450];
 
-  function Enemy($gameBox, speed, val1, val2, val3) {
+  function Enemy($gameBox, speed, $player, val1, val2, val3) {
     this.$gameBox = $gameBox;
     this.speed = speed;
+    this.$player = $player;
     this.val1 = val1;
     this.val2 = val2;
     this.val3 = val3;
+    this.checkDestroy = bind(this.checkDestroy, this);
+    this.startAnimation = bind(this.startAnimation, this);
     this.createEnemyDiv();
   }
 
@@ -198,6 +200,7 @@ Enemy = (function() {
   };
 
   Enemy.prototype.createEnemyHoles = function() {
+    this.myHoles = [this.val1, this.val2, this.val3];
     this.$me.append(this.createEnemyHole(0, this.val1));
     this.$me.append(this.createEnemyHole(1, this.val2));
     return this.$me.append(this.createEnemyHole(2, this.val3));
@@ -213,7 +216,21 @@ Enemy = (function() {
   Enemy.prototype.startAnimation = function() {
     return this.$me.animate({
       top: this.endTop
-    }, 5000, "linear");
+    }, this.speed, "linear", this.checkDestroy);
+  };
+
+  Enemy.prototype.checkDestroy = function() {
+    var pos;
+    pos = this.$player.myPos;
+    if (this.myHoles[pos] === this.$player.type) {
+      return this.destroyMe();
+    }
+  };
+
+  Enemy.prototype.destroyMe = function() {
+    return this.$me.toggle("explode", {
+      pieces: 27
+    }, "slow");
   };
 
   return Enemy;
