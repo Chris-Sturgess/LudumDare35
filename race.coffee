@@ -1,1 +1,25 @@
-console.log("Imported")
+run = (window, $) =>
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+$(document).ready(->
+	run(window, $)
+);
