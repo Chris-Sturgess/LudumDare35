@@ -18,7 +18,7 @@ class Game
 	initGame: ->
 		@$gameBox = $('#gameBox')
 		@$car = new Character(@$gameBox, this)
-		@timeInterval = 500
+		@timeInterval = 2000
 		@enemyCounter = 1
 		@enemies = {}
 		@initTimer()
@@ -27,11 +27,27 @@ class Game
 		@timer = setTimeout(@generateEnemy, 1000)
 
 	generateEnemy: =>
-		@enemies[@enemyCounter] = new Enemy(@$gameBox, @timeInterval * 2, @$car, this, @enemyCounter, @CIRCLE, @TRIANGLE, @SQUARE)
+		@enemies[@enemyCounter] = new Enemy(@$gameBox, @timeInterval * 2, @$car, this, @enemyCounter, @generateHolePattern())
 		@timer = setTimeout(@generateEnemy, @timeInterval)
 		@timeInterval = @timeInterval * 0.99
 		@timeInterval = 800 if @timeInterval < 800
 		@enemyCounter += 1
+
+	generateHolePattern: =>
+		holes = []
+		for x in [0..2]
+			r = Math.random()
+			if r < 0.25
+				holes[x] = @CIRCLE
+			else if r < 0.5
+				holes[x] = @TRIANGLE
+			else if r < 0.75
+				holes[x] = @SQUARE
+			else
+				holes[x] = null
+
+		holes
+
 
 	endGame: =>
 
@@ -125,7 +141,7 @@ class Enemy
 
 	POS: [150, 300, 450]
 
-	constructor: (@$gameBox, @speed, @$player, @game, @id, @val1, @val2, @val3) ->
+	constructor: (@$gameBox, @speed, @$player, @game, @id, @myHoles) ->
 		@createEnemyDiv()
 
 	createEnemyDiv: () ->
@@ -136,10 +152,9 @@ class Enemy
 		@startAnimation()
 
 	createEnemyHoles: () ->
-		@myHoles = [@val1, @val2, @val3]
-		@$me.append(@createEnemyHole(0, @val1))
-		@$me.append(@createEnemyHole(1, @val2))
-		@$me.append(@createEnemyHole(2, @val3))
+		@$me.append(@createEnemyHole(0, @myHoles[0]))
+		@$me.append(@createEnemyHole(1, @myHoles[1]))
+		@$me.append(@createEnemyHole(2, @myHoles[2]))
 
 	createEnemyHole: (pos, type) ->
 		hole = $("<div class='enemyHole #{type}'>")

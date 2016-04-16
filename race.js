@@ -20,6 +20,7 @@ Game = (function() {
   function Game() {
     this.destroyEnemy = bind(this.destroyEnemy, this);
     this.endGame = bind(this.endGame, this);
+    this.generateHolePattern = bind(this.generateHolePattern, this);
     this.generateEnemy = bind(this.generateEnemy, this);
     this.initGame();
   }
@@ -31,7 +32,7 @@ Game = (function() {
   Game.prototype.initGame = function() {
     this.$gameBox = $('#gameBox');
     this.$car = new Character(this.$gameBox, this);
-    this.timeInterval = 500;
+    this.timeInterval = 2000;
     this.enemyCounter = 1;
     this.enemies = {};
     return this.initTimer();
@@ -42,13 +43,31 @@ Game = (function() {
   };
 
   Game.prototype.generateEnemy = function() {
-    this.enemies[this.enemyCounter] = new Enemy(this.$gameBox, this.timeInterval * 2, this.$car, this, this.enemyCounter, this.CIRCLE, this.TRIANGLE, this.SQUARE);
+    this.enemies[this.enemyCounter] = new Enemy(this.$gameBox, this.timeInterval * 2, this.$car, this, this.enemyCounter, this.generateHolePattern());
     this.timer = setTimeout(this.generateEnemy, this.timeInterval);
     this.timeInterval = this.timeInterval * 0.99;
     if (this.timeInterval < 800) {
       this.timeInterval = 800;
     }
     return this.enemyCounter += 1;
+  };
+
+  Game.prototype.generateHolePattern = function() {
+    var holes, i, r, x;
+    holes = [];
+    for (x = i = 0; i <= 2; x = ++i) {
+      r = Math.random();
+      if (r < 0.25) {
+        holes[x] = this.CIRCLE;
+      } else if (r < 0.5) {
+        holes[x] = this.TRIANGLE;
+      } else if (r < 0.75) {
+        holes[x] = this.SQUARE;
+      } else {
+        holes[x] = null;
+      }
+    }
+    return holes;
   };
 
   Game.prototype.endGame = function() {};
@@ -194,15 +213,13 @@ Enemy = (function() {
 
   Enemy.prototype.POS = [150, 300, 450];
 
-  function Enemy($gameBox, speed, $player, game, id1, val1, val2, val3) {
+  function Enemy($gameBox, speed, $player, game, id1, myHoles) {
     this.$gameBox = $gameBox;
     this.speed = speed;
     this.$player = $player;
     this.game = game;
     this.id = id1;
-    this.val1 = val1;
-    this.val2 = val2;
-    this.val3 = val3;
+    this.myHoles = myHoles;
     this.destroyMe = bind(this.destroyMe, this);
     this.checkDestroy = bind(this.checkDestroy, this);
     this.startAnimation = bind(this.startAnimation, this);
@@ -218,10 +235,9 @@ Enemy = (function() {
   };
 
   Enemy.prototype.createEnemyHoles = function() {
-    this.myHoles = [this.val1, this.val2, this.val3];
-    this.$me.append(this.createEnemyHole(0, this.val1));
-    this.$me.append(this.createEnemyHole(1, this.val2));
-    return this.$me.append(this.createEnemyHole(2, this.val3));
+    this.$me.append(this.createEnemyHole(0, this.myHoles[0]));
+    this.$me.append(this.createEnemyHole(1, this.myHoles[1]));
+    return this.$me.append(this.createEnemyHole(2, this.myHoles[2]));
   };
 
   Enemy.prototype.createEnemyHole = function(pos, type) {

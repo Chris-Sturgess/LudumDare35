@@ -39,11 +39,11 @@
   width: 30px;
   height: 30px;
   position: absolute;
-  background-color: white;
 }
-/* line 13, ../sass/enemy.sass */
+/* line 12, ../sass/enemy.sass */
 .enemy .enemyHole.circle {
   border-radius: 50%;
+  background-color: white;
 }
 /* line 16, ../sass/enemy.sass */
 .enemy .enemyHole.triangle {
@@ -53,6 +53,10 @@
   border-bottom: 30px solid white;
   border-left: 15px solid transparent;
   border-right: 15px solid transparent;
+}
+/* line 24, ../sass/enemy.sass */
+.enemy .enemyHole.square {
+  background-color: white;
 }
 
 /* line 6, ../sass/main.sass */
